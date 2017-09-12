@@ -11,7 +11,7 @@ namespace tstAjaxAndJQuery.apis
 {
     public class ProductsController : ApiController
     {
-        private List<Product> _db = new List<Product>()
+        private static List<Product> _db = new List<Product>()
         {
             new Product() {Id = 1, Name = "Cheese", Price = 300.0, Quantity = 170},
             new Product() {Id = 2, Name = "Bread", Price = 150.0, Quantity = 1500},
@@ -31,7 +31,17 @@ namespace tstAjaxAndJQuery.apis
         {
             return new JavaScriptSerializer().Serialize(_db.First(item => item.Id == id));
         }
-
-
+        [HttpPost]
+        public bool AddProduct(Product p)
+        {
+            if (_db.FindIndex(item => item.Id == p.Id) != -1) return false;
+            _db.Add(p);
+            return true;
+        }
+        [HttpPost]
+        public bool DeleteProduct(int id)
+        {
+            return _db.Remove(_db.First(item=>item.Id == id));
+        }
     }
 }
