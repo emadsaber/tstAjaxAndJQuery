@@ -1,42 +1,98 @@
-﻿<%@ Page Title="Home Page" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="tstAjaxAndJQuery._Default" %>
+﻿<%@ Page Language="C#"  AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="tstAjaxAndJQuery._Default" %>
 
-<asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
-
-    <div class="jumbotron">
-        <h1>ASP.NET</h1>
-        <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
-        <p><a href="http://www.asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-    </div>
-
+<html>
+<head>
+    <title>asda</title>    
+</head>
+    <body>
     <div class="row">
         <div class="col-md-4">
-            <h2>Getting started</h2>
-            <p>
-                ASP.NET Web Forms lets you build dynamic websites using a familiar drag-and-drop, event-driven model.
-            A design surface and hundreds of controls and components let you rapidly build sophisticated, powerful UI-driven sites with data access.
-            </p>
-            <p>
-                <a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301948">Learn more &raquo;</a>
-            </p>
-        </div>
-        <div class="col-md-4">
-            <h2>Get more libraries</h2>
-            <p>
-                NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.
-            </p>
-            <p>
-                <a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301949">Learn more &raquo;</a>
-            </p>
-        </div>
-        <div class="col-md-4">
-            <h2>Web Hosting</h2>
-            <p>
-                You can easily find a web hosting company that offers the right mix of features and price for your applications.
-            </p>
-            <p>
-                <a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301950">Learn more &raquo;</a>
-            </p>
+            <%: Scripts.Render("~/bundles/jquery") %>
+            <script>
+                $(document).ready(function() {
+                    //Init
+                    loadInitialData();
+
+
+                    $("#getData").click(function () {
+                        console.log('sdfsd');
+                        displayResult(getProduct($(".source").val()));
+                    });
+                    
+                    function loadInitialData() {
+                        var items = getAllProducts();
+                        console.log(Date.now());
+                        
+                    }
+
+                    function bindToSelectList(items) {
+                        if (items === undefined || items === null || items.length === 0) return;
+                        if (items.length === 1) {
+                            $(".source").append("<option value='" + items.Id + "'>" + items.Name + "</option>");
+                        } else {
+                            $.each(items,
+                                function(index, value) {
+                                    $(".source").append("<option value='" + value.Id + "'>" + value.Name + "</option>");
+                                });
+                        }
+                    }
+                    function getAllProducts() {
+                        $.ajax({
+                            url: '/api/Products/GetAllProducts',
+                            type: 'GET',
+                            async: false,
+                            dataType: 'json'
+                        })
+                        .done(function (data) {
+                                bindToSelectList($.parseJSON(data));
+                            })
+                        .fail(function(xhr, status, ex) {
+                            console.dir(xhr);
+                            return ex;
+                        });
+                    }
+
+                    function getProduct(pid){
+                        $.ajax({
+                                url: '/api/Products/GetProduct',
+                                data: { id: pid },
+                                type: "GET",
+                                dataType: "json"
+                            })
+                            .done(function(data) {
+                                displayResult($.parseJSON(data));
+                            })
+                            .fail(function(xhr, status, ex) {
+                                console.log('Failed to retreive data from server');
+                            })
+                            .always(function() {
+                                console.log('Operation Completed');
+                            });
+
+                    }
+
+                    function displayResult(res) {
+                        $(".target").html('');
+                        if (res.length > 1) {
+                            $.each(res,
+                                function(index, value) {
+                                    $(".target").append("<li>" + value.Name + " [ " + value.Price + " L.E.]</li>");
+                                });
+                        } else {
+                            $(".target").append("<li>" + res.Name + " [ " + res.Price + " L.E.]</li>");
+                        }
+                    }
+                });
+                
+                
+            </script>
+            
+            <div class="myform">
+                <select class="source"></select>
+                <button id="getData">Get Data</button>
+                <ul class="target"></ul>
+            </div>
         </div>
     </div>
-
-</asp:Content>
+</body>
+</html>

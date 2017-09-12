@@ -33,6 +33,8 @@ namespace tstAjaxAndJQuery
             // ready for production, use the build tool at http://modernizr.com to pick only the tests you need
             bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
                             "~/Scripts/modernizr-*"));
+            bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
+                "~/Scripts/jquery-1.10.2.min.js"));
 
             ScriptManager.ScriptResourceMapping.AddDefinition(
                 "respond",
